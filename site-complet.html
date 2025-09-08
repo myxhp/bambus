@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Site modern, într-un singur fișier HTML: landing page, secțiuni, stil și interactivitate minimală." />
+  <title>Site Complet - O Pagină</title>
+  <style>
+    /* Reset & base */
+    *, *::before, *::after { box-sizing: border-box; }
+    :root{
+      --bg: #0b1220;
+      --surface: #111a2b;
+      --muted: #97a4ba;
+      --text: #e6edf7;
+      --accent: #7cc4ff;
+      --accent-2: #a1f0d1;
+      --ring: 0 0 0 3px rgba(124,196,255,.35);
+      --radius-lg: 18px;
+      --radius-sm: 12px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --shadow-soft: 0 6px 18px rgba(0,0,0,.25);
+      --maxw: 1100px;
+    }
+    html, body { height: 100%; scroll-behavior: smooth; }
+    body{
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, Apple Color Emoji, Segoe UI Emoji;
+      background: radial-gradient(1200px 600px at 10% -10%, rgba(124,196,255,.12), transparent 60%),
+                  radial-gradient(800px 400px at 90% 0%, rgba(161,240,209,.10), transparent 55%),
+                  var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+    .container{ width: 100%; max-width: var(--maxw); margin-inline: auto; padding: 0 20px; }
+
+    /* Header */
+    header{
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: saturate(140%) blur(8px);
+      background: linear-gradient(to bottom, rgba(11,18,32,.8), rgba(11,18,32,.4));
+      border-bottom: 1px solid rgba(151,164,186,.15);
+    }
+    .nav{
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 0;
+    }
+    .brand{ display: inline-flex; align-items: center; gap: 10px; font-weight: 700; }
+    .brand-logo{
+      width: 36px; height: 36px; border-radius: 12px; display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: var(--shadow-soft);
+    }
+    .brand span{ letter-spacing: .3px; }
+
+    .menu{ display: flex; gap: 18px; align-items: center; }
+    .menu a{
+      padding: 8px 10px; border-radius: 10px; color: var(--muted);
+    }
+    .menu a:hover{ color: var(--text); background: rgba(151,164,186,.12); }
+
+    .cta{
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, rgba(124,196,255,.2), rgba(161,240,209,.2));
+      border: 1px solid rgba(124,196,255,.35);
+      padding: 10px 14px; border-radius: 14px; color: var(--text);
+      box-shadow: var(--shadow-soft);
+    }
+    .cta:hover{ box-shadow: var(--shadow); }
+
+    .hamb{ display: none; width: 40px; height: 40px; border-radius: 10px; border: 1px solid rgba(151,164,186,.25); background: transparent; color: var(--text); }
+    #mobileNav{ display: none; }
+
+    /* Hero */
+    .hero{ padding: 70px 0 40px; }
+    .hero-grid{
+      display: grid; gap: 28px; align-items: center;
+      grid-template-columns: 1.05fr .95fr;
+    }
+    .badge{
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 999px; font-size: 14px;
+      color: var(--text);
+      background: rgba(124,196,255,.15);
+      border: 1px solid rgba(124,196,255,.35);
+    }
+    .h1{
+      font-size: clamp(32px, 5vw, 52px); line-height: 1.1; margin: 14px 0 10px; font-weight: 800;
+    }
+    .lead{ color: var(--muted); font-size: clamp(16px, 2.4vw, 18px); }
+    .hero-actions{ display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+    .btn{
+      display:inline-flex; align-items:center; gap:10px; border:1px solid rgba(151,164,186,.28);
+      padding:12px 16px; border-radius:14px; background: rgba(17,26,43,.65); color: var(--text);
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(124,196,255,.25), rgba(161,240,209,.25));
+      border-color: rgba(124,196,255,.45);
+    }
+    .btn:hover{ box-shadow: var(--shadow-soft); transform: translateY(-1px); }
+
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.02), transparent 80%);
+      border: 1px solid rgba(151,164,186,.18);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow-soft);
+    }
+    .preview{
+      aspect-ratio: 16/10; border-radius: var(--radius-lg); overflow: hidden; position: relative;
+      background: radial-gradient(140% 100% at 80% -10%, rgba(124,196,255,.18), transparent 50%),
+                  linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0)),
+                  #0e1627;
+      border: 1px dashed rgba(151,164,186,.25);
+    }
+    .preview .blob{
+      position: absolute; filter: blur(40px); opacity: .7;
+      background: conic-gradient(from 90deg at 50% 50%, rgba(124,196,255,.6), rgba(161,240,209,.6), rgba(124,196,255,.6));
+      width: 200px; height: 200px; border-radius: 50%;
+      animation: float 10s ease-in-out infinite;
+    }
+    .preview .blob.b2{ left: 10%; top: 15%; animation-delay: -3s; }
+    .preview .blob.b1{ right: 10%; bottom: 8%; }
+
+    @keyframes float{
+      0%,100%{ transform: translateY(0) translateX(0) scale(1); }
+      50%{ transform: translateY(-14px) translateX(6px) scale(1.05); }
+    }
+
+    /* Sections */
+    section{ padding: 60px 0; }
+    .sec-title{ font-size: 28px; margin: 0 0 6px; }
+    .sec-lead{ color: var(--muted); margin: 0 0 20px; }
+
+    .grid-3{
+      display: grid; gap: 18px;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+    .feature{ display: grid; gap: 10px; }
+    .feature h3{ margin: 0; font-size: 18px; }
+    .feature p{ margin: 0; color: var(--muted); }
+
+    .showcase{
+      display: grid; gap: 18px; grid-template-columns: 1fr 1fr;
+    }
+    .panel{ border-radius: var(--radius-lg); border: 1px solid rgba(151,164,186,.2); padding: 18px; }
+
+    .pricing{
+      display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+    .price-card h4{ margin: 0 0 6px; font-size: 20px; }
+    .price{ font-weight: 800; font-size: 28px; margin: 10px 0; }
+    .muted{ color: var(--muted); }
+
+    .testimonials{
+      display: grid; gap: 18px; grid-template-columns: repeat(3, minmax(0,1fr));
+    }
+    .quote{ font-style: italic; color: var(--muted); }
+    .avatar{
+      width: 42px; height: 42px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: inline-block; margin-right: 10px;
+    }
+
+    .contact-grid{
+      display: grid; gap: 18px; grid-template-columns: 1.2fr .8fr;
+    }
+    form{
+      display: grid; gap: 12px;
+    }
+    label{ font-size: 14px; color: var(--muted); }
+    input, textarea, select{
+      width: 100%;
+      background: rgba(17,26,43,.65);
+      border: 1px solid rgba(151,164,186,.28);
+      border-radius: 12px; padding: 12px 14px; color: var(--text);
+      outline: none;
+    }
+    input:focus, textarea:focus, select:focus{ box-shadow: var(--ring); border-color: rgba(124,196,255,.6); }
+    textarea{ min-height: 120px; resize: vertical; }
+    .note{ font-size: 13px; color: var(--muted); }
+
+    footer{
+      padding: 30px 0 50px; color: var(--muted);
+      border-top: 1px solid rgba(151,164,186,.15);
+      background: linear-gradient(to top, rgba(17,26,43,.5), rgba(17,26,43,0));
+    }
+    .foot-grid{ display: grid; gap: 18px; grid-template-columns: 1.1fr 1fr 1fr 1fr; }
+    .foot h5{ margin: 0 0 8px; color: var(--text); }
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-grid, .showcase, .contact-grid{ grid-template-columns: 1fr; }
+    }
+    @media (max-width: 780px){
+      .grid-3, .pricing, .testimonials, .foot-grid{ grid-template-columns: 1fr; }
+      .menu{ display: none; }
+      .hamb{ display: inline-grid; place-items: center; }
+      #mobileNav.open{ display: grid; gap: 8px; padding: 10px 0 16px; }
+      #mobileNav a{ padding: 10px 12px; border-radius: 10px; color: var(--muted); }
+      #mobileNav a:hover{ color: var(--text); background: rgba(151,164,186,.12); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container nav">
+      <a href="#" class="brand" aria-label="Acasă">
+        <span class="brand-logo" aria-hidden="true">
+          <!-- Inline SVG logo -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M12 3l8 5v8l-8 5-8-5V8l8-5z" fill="white" opacity=".9"/>
+            <path d="M12 3v18" stroke="#0b1220" stroke-opacity=".25" stroke-width="2"/>
+          </svg>
+        </span>
+        <span>Brandul Tău</span>
+      </a>
+      <nav class="menu" aria-label="Meniu principal">
+        <a href="#caracteristici">Caracteristici</a>
+        <a href="#exemple">Exemple</a>
+        <a href="#preturi">Prețuri</a>
+        <a href="#testimoniale">Testimoniale</a>
+        <a href="#contact">Contact</a>
+      </nav>
+      <div class="actions" style="display:flex; gap:10px; align-items:center;">
+        <a class="cta" href="#contact" role="button" aria-label="Începe acum">Începe acum</a>
+        <button class="hamb" id="hamb" aria-expanded="false" aria-controls="mobileNav" aria-label="Deschide meniul">
+          <!-- hamburger -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+    <div class="container" id="mobileNav" role="region" aria-label="Meniu mobil">
+      <a href="#caracteristici">Caracteristici</a>
+      <a href="#exemple">Exemple</a>
+      <a href="#preturi">Prețuri</a>
+      <a href="#testimoniale">Testimoniale</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <span class="badge">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 2l3.09 6.26L22 9.27l-5 4.9L18.18 22 12 18.56 5.82 22 7 14.17l-5-4.9 6.91-1.01L12 2z" fill="currentColor"/>
+            </svg>
+            Nou: versiune cu o singură pagină
+          </span>
+          <h1 class="h1">Construiește rapid un site elegant, responsiv și accesibil.</h1>
+          <p class="lead">Totul într-un singur fișier HTML: design modern, animații discrete, structură clară și formulare gata de utilizare. Fără dependențe externe.</p>
+          <div class="hero-actions">
+            <a href="#preturi" class="btn primary">Vezi prețuri</a>
+            <a href="#exemple" class="btn">Explorează exemple</a>
+            <a href="#contact" class="btn" aria-label="Contactează-ne">Contact</a>
+          </div>
+          <p class="note">🔒 Respectă bune practici: contrast, semnătură semantică, aria-labels, navigație cu tastatura.</p>
+        </div>
+        <div class="card">
+          <div class="preview" aria-hidden="true">
+            <div class="blob b1"></div>
+            <div class="blob b2"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px;">
+            <div class="panel">
+              <strong>0 dependențe</strong>
+              <p class="muted">Doar HTML + CSS + JS minimalist.</p>
+            </div>
+            <div class="panel">
+              <strong>SEO & Meta</strong>
+              <p class="muted">Titlu, descriere, semantic corect.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="caracteristici">
+      <div class="container">
+        <h2 class="sec-title">Caracteristici principale</h2>
+        <p class="sec-lead">Elemente esențiale pentru un landing page modern.</p>
+        <div class="grid-3">
+          <div class="card feature">
+            <h3>Design responsiv</h3>
+            <p>Grile fluide, tipografie adaptivă, culori prietenoase cu întunericul.</p>
+          </div>
+          <div class="card feature">
+            <h3>Performanță</h3>
+            <p>Un singur fișier, fără fonturi sau imagini externe — încărcare rapidă.</p>
+          </div>
+          <div class="card feature">
+            <h3>Accesibilitate</h3>
+            <p>Roluri ARIA, stări focus vizibile, contrast ridicat.</p>
+          </div>
+          <div class="card feature">
+            <h3>Componente</h3>
+            <p>Carduri, panouri, butoane, badge, navigație sticky.</p>
+          </div>
+          <div class="card feature">
+            <h3>Animații subtile</h3>
+            <p>Mișcări fine pe elementele decorative, fără distragere.</p>
+          </div>
+          <div class="card feature">
+            <h3>Pregătit de extins</h3>
+            <p>Secțiuni clare: exemple, prețuri, testimoniale, contact.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="exemple">
+      <div class="container">
+        <h2 class="sec-title">Exemple & prezentare</h2>
+        <p class="sec-lead">Arată ce știi să faci sau ce oferi.</p>
+        <div class="showcase">
+          <div class="card">
+            <h3 style="margin-top:0">Panou de prezentare</h3>
+            <p class="muted">Text scurt, clar, avantaje și beneficii.</p>
+            <ul>
+              <li>Structură curată și coerentă;</li>
+              <li>Stil modern, ușor de personalizat;</li>
+              <li>Compatibilitate excelentă între browsere.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 style="margin-top:0">Specificații</h3>
+            <p class="muted">Detalii tehnice și bune practici.</p>
+            <ul>
+              <li>HTML5 semantic, meta corecte;</li>
+              <li>CSS modern (grid, clamp, vars);</li>
+              <li>JS minim: meniu mobil & validare.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="preturi">
+      <div class="container">
+        <h2 class="sec-title">Prețuri transparente</h2>
+        <p class="sec-lead">Alege planul potrivit proiectului tău.</p>
+        <div class="pricing">
+          <div class="card price-card">
+            <h4>Start</h4>
+            <p class="muted">Pentru proiecte mici</p>
+            <p class="price">€0</p>
+            <p class="muted">Licență personală • Fără suport</p>
+            <a href="#contact" class="btn primary">Începe gratuit</a>
+          </div>
+          <div class="card price-card">
+            <h4>Pro</h4>
+            <p class="muted">Freelanceri & echipe mici</p>
+            <p class="price">€49</p>
+            <p class="muted">Actualizări minore • Suport email</p>
+            <a href="#contact" class="btn primary">Ia Pro</a>
+          </div>
+          <div class="card price-card">
+            <h4>Business</h4>
+            <p class="muted">Companii & agenții</p>
+            <p class="price">€199</p>
+            <p class="muted">Personalizare • Suport prioritar</p>
+            <a href="#contact" class="btn primary">Contactează vânzări</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="testimoniale">
+      <div class="container">
+        <h2 class="sec-title">Ce spun clienții</h2>
+        <p class="sec-lead">Păreri reale care inspiră încredere.</p>
+        <div class="testimonials">
+          <div class="card">
+            <div style="display:flex; align-items:center;">
+              <span class="avatar" aria-hidden="true"></span>
+              <div><strong>Ana M.</strong><div class="muted">Antreprenor</div></div>
+            </div>
+            <p class="quote">„Arată grozav pe orice dispozitiv și se încarcă instant.”</p>
+          </div>
+          <div class="card">
+            <div style="display:flex; align-items:center;">
+              <span class="avatar" aria-hidden="true"></span>
+              <div><strong>Vlad P.</strong><div class="muted">Designer</div></div>
+            </div>
+            <p class="quote">„Cod curat, ușor de adaptat. Mi-a redus mult timpul de livrare.”</p>
+          </div>
+          <div class="card">
+            <div style="display:flex; align-items:center;">
+              <span class="avatar" aria-hidden="true"></span>
+              <div><strong>Irina C.</strong><div class="muted">PM</div></div>
+            </div>
+            <p class="quote">„Exact ce aveam nevoie pentru un MVP rapid.”</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <h2 class="sec-title">Contact</h2>
+        <p class="sec-lead">Spune-ne pe scurt despre proiect.</p>
+        <div class="contact-grid">
+          <form id="contactForm" novalidate>
+            <div>
+              <label for="nume">Nume</label>
+              <input id="nume" name="nume" type="text" placeholder="Nume complet" required />
+            </div>
+            <div>
+              <label for="email">Email</label>
+              <input id="email" name="email" type="email" placeholder="nume@exemplu.com" required />
+            </div>
+            <div>
+              <label for="tip">Tip proiect</label>
+              <select id="tip" name="tip">
+                <option>Website</option>
+                <option>Landing Page</option>
+                <option>Magazin online</option>
+                <option>Altceva</option>
+              </select>
+            </div>
+            <div>
+              <label for="mesaj">Mesaj</label>
+              <textarea id="mesaj" name="mesaj" placeholder="Descrie pe scurt obiectivele."></textarea>
+            </div>
+            <button class="btn primary" type="submit">Trimite</button>
+            <p class="note" id="formNote" role="status" aria-live="polite"></p>
+          </form>
+
+          <div class="card">
+            <h3 style="margin-top:0">Date de contact</h3>
+            <p class="muted">Program: Luni–Vineri, 09:00–17:00</p>
+            <p class="muted">Email: exemplu@brand.ro</p>
+            <p class="muted">Telefon: +40 700 000 000</p>
+            <div style="height:1px; background: rgba(151,164,186,.2); margin:16px 0;"></div>
+            <p class="muted">Urmărește-ne pe rețelele preferate.</p>
+            <div style="display:flex; gap:10px;">
+              <a class="btn" href="#" aria-label="Instagram">Instagram</a>
+              <a class="btn" href="#" aria-label="LinkedIn">LinkedIn</a>
+              <a class="btn" href="#" aria-label="Twitter">X</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container foot-grid">
+      <div class="foot">
+        <h5>Brandul Tău</h5>
+        <p>Un starter modern pentru site-uri rapide, cu impact.</p>
+      </div>
+      <div class="foot">
+        <h5>Produs</h5>
+        <a href="#caracteristici">Caracteristici</a><br/>
+        <a href="#exemple">Exemple</a><br/>
+        <a href="#preturi">Prețuri</a>
+      </div>
+      <div class="foot">
+        <h5>Companie</h5>
+        <a href="#contact">Contact</a><br/>
+        <a href="#testimoniale">Testimoniale</a>
+      </div>
+      <div class="foot">
+        <h5>Legal</h5>
+        <a href="#">Termeni</a><br/>
+        <a href="#">Confidențialitate</a>
+      </div>
+    </div>
+    <div class="container" style="margin-top:20px; display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+      <span>© <span id="year"></span> Brandul Tău</span>
+      <a class="btn" href="#top" aria-label="Înapoi sus">↑ Sus</a>
+    </div>
+  </footer>
+
+  <script>
+    // Anul curent în footer
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Meniu mobil
+    const hamb = document.getElementById('hamb');
+    const mobileNav = document.getElementById('mobileNav');
+    hamb.addEventListener('click', () => {
+      const open = mobileNav.classList.toggle('open');
+      hamb.setAttribute('aria-expanded', String(open));
+    });
+
+    // Validare de bază a formularului (frontend)
+    const form = document.getElementById('contactForm');
+    const note = document.getElementById('formNote');
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const data = new FormData(form);
+      const nume = data.get('nume')?.toString().trim();
+      const email = data.get('email')?.toString().trim();
+
+      if(!nume){
+        note.textContent = 'Te rugăm să completezi numele.'; return;
+      }
+      if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+        note.textContent = 'Te rugăm să introduci un email valid.'; return;
+      }
+      note.textContent = 'Mulțumim! Mesajul a fost pregătit. (Aceasta este doar o simulare — adaugă backend-ul preferat.)';
+      form.reset();
+    });
+  </script>
+</body>
+</html>
