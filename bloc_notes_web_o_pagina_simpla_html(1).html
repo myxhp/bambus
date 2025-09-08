@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bloc‑Notes Simplu</title>
+  <style>
+    :root { --bg:#111827; --fg:#e5e7eb; --muted:#6b7280; --accent:#2563eb; }
+    * { box-sizing: border-box; }
+    html, body { height:100%; margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; }
+    body { background:var(--bg); color:var(--fg); display:flex; flex-direction:column; }
+    header { padding:12px 16px; display:flex; gap:8px; align-items:center; border-bottom:1px solid #1f2937; }
+    header h1 { font-size:16px; margin:0; font-weight:600; letter-spacing:.2px; }
+    .spacer { flex:1; }
+    button, label.button { background:#1f2937; color:var(--fg); border:1px solid #374151; padding:8px 12px; border-radius:12px; cursor:pointer; font-size:14px; }
+    button:hover, label.button:hover { border-color:#4b5563; }
+    button.accent { background:var(--accent); border-color:transparent; }
+    main { flex:1; display:grid; }
+    textarea { width:100%; height:100%; padding:18px; border:0; outline:0; resize:none; background:transparent; color:var(--fg); line-height:1.6; font-size:16px; }
+    footer { padding:8px 16px; font-size:12px; color:var(--muted); border-top:1px solid #1f2937; }
+    .hidden-input { display:none; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Bloc‑Notes Simplu</h1>
+    <div class="spacer"></div>
+    <button id="newBtn" title="Golește tot (Ctrl+N)">Nou</button>
+    <button id="saveBtn" class="accent" title="Descarcă textul (Ctrl+S)">Descarcă .txt</button>
+    <label class="button" title="Încarcă un fișier .txt">
+      Încarcă
+      <input id="openFile" class="hidden-input" type="file" accept="text/plain,.txt" />
+    </label>
+  </header>
+
+  <main>
+    <textarea id="pad" placeholder="Scrie aici…"></textarea>
+  </main>
+
+  <footer>
+    Autosalvare locală activă. Conținutul rămâne în acest browser (localStorage).
+  </footer>
+
+  <script>
+    (function(){
+      const KEY = 'blocnotes.simplu.v1';
+      const pad = document.getElementById('pad');
+      const saveBtn = document.getElementById('saveBtn');
+      const newBtn = document.getElementById('newBtn');
+      const openFile = document.getElementById('openFile');
+
+      // Încarcă din localStorage
+      try { pad.value = localStorage.getItem(KEY) || ''; } catch(_) {}
+
+      // Autosave (debounce)
+      let t; pad.addEventListener('input', () => {
+        clearTimeout(t);
+        t = setTimeout(() => { try { localStorage.setItem(KEY, pad.value); } catch(_) {} }, 250);
+      });
+
+      // Nou (golește textul)
+      newBtn.addEventListener('click', () => {
+        if (pad.value.trim() && !confirm('Sigur vrei să golești tot?')) return;
+        pad.value = '';
+        try { localStorage.removeItem(KEY); } catch(_) {}
+        pad.focus();
+      });
+
+      // Descarcă .txt
+      function downloadTxt(filename, text){
+        const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+        setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 0);
+      }
+      saveBtn.addEventListener('click', () => {
+        const name = 'notite-' + new Date().toISOString().slice(0,10) + '.txt';
+        downloadTxt(name, pad.value);
+      });
+
+      // Încarcă din fișier
+      openFile.addEventListener('change', (e) => {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = () => { pad.value = reader.result || ''; pad.dispatchEvent(new Event('input')); };
+        reader.readAsText(file);
+        e.target.value = '';
+      });
+
+      // Shortcuts: Ctrl+S / Ctrl+N
+      window.addEventListener('keydown', (e) => {
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); saveBtn.click(); }
+        if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'n') { e.preventDefault(); newBtn.click(); }
+      });
+
+      // Focus la încărcare
+      window.addEventListener('load', () => pad.focus());
+    })();
+  </script>
+</body>
+</html>
