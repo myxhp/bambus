@@ -1,7 +1,3 @@
-my first ever file
-idk
-what
-to
-say
-sorry
-guys
+@myxhp
+@oakyso
+shout out codin mark richard andrei n david vro
